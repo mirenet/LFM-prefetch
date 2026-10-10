@@ -278,30 +278,31 @@ public class MainActivity extends AppCompatActivity {
                     String cleanUrlStr = mainParts[0];
                     String fragment = mainParts[1];
 
-                    boolean isHtmlMode = fragment.contains("html");
-                    boolean isApiMode = fragment.contains("api");
-
-                    String defaultUa;
-                    if (isHtmlMode) {
-                        defaultUa = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-                    } else if (isApiMode) {
-                        defaultUa = "LFM_MusicApp/1.0 (contact: moj@gmail.com)";
-                    } else {
-                        defaultUa = (!broAgent.isEmpty()) ? broAgent : webView.getSettings().getUserAgentString();
-                    }
-
-                    String finalUa = defaultUa;
+                    // Pronalaženje "ua" parametra iz fragmenta
+                    String customUa = "";
                     if (fragment.contains("ua=")) {
                         try {
                             String[] uaParts = fragment.split("ua=");
                             if (uaParts.length > 1) {
-                                String customUa = URLDecoder.decode(uaParts[1].split("&")[0], "UTF-8");
-                                if (!customUa.isEmpty() && customUa.length() < 300) {
-                                    finalUa = customUa;
-                                }
+                                customUa = URLDecoder.decode(uaParts[1].split("&")[0], "UTF-8");
                             }
                         } catch (Exception ignored) {}
                     }
+
+                    // Određivanje finalnog User-Agent-a
+                    String finalUa;
+                    if (!customUa.isEmpty() && customUa.length() < 300) {
+                        finalUa = customUa;
+                    } else {
+                        finalUa = (!broAgent.isEmpty()) ? broAgent : webView.getSettings().getUserAgentString();
+                    }
+
+                    // Pametna detekcija moda na osnovu user-agent stringa:
+                    // Pošto svi standardni browseri (Mac, Windows, iPhone, Android, tablet...) počinju sa "Mozilla",
+                    // ukoliko string sadrži "mozilla", to je HTML mod. Sve ostalo je API mod.
+                    String lowerUa = finalUa.toLowerCase();
+                    boolean isHtmlMode = lowerUa.contains("mozilla");
+                    boolean isApiMode = !isHtmlMode;
 
                     URL url = new URL(cleanUrlStr);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
