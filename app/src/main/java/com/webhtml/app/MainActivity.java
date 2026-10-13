@@ -310,8 +310,15 @@ public class MainActivity extends AppCompatActivity {
                     connection.setRequestProperty("User-Agent", finalUa);
                     
                     if (isHtmlMode) {
-                        connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                        connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8");
                         connection.setRequestProperty("Accept-Language", "en-US,en;q=0.9");
+                        connection.setRequestProperty("Upgrade-Insecure-Requests", "1");
+                        connection.setRequestProperty("Sec-Fetch-Site", "none");
+                        connection.setRequestProperty("Sec-Fetch-Mode", "navigate");
+                        connection.setRequestProperty("Sec-Fetch-User", "?1");
+                        connection.setRequestProperty("Sec-Fetch-Dest", "document");
+                    } else {
+                        connection.setRequestProperty("Accept", "application/json, application/ld+json, text/plain, */*");
                     }
                     
                     connection.setConnectTimeout(10000);
